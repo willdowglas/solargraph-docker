@@ -1,0 +1,5 @@
+services:
+  solargraph:
+    build: .
+    ports:
+      - "7658:7658"
