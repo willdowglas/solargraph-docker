@@ -1,28 +1,16 @@
-ARG RUBY_VERSION="2.7.3"
+FROM ruby:3.1.2-alpine3.16
 
-FROM ruby:$RUBY_VERSION-slim
+WORKDIR /usr/src/app
 
-ENV APP_ROOT /usr/src/app
+COPY . .
 
-RUN apt update \
-  && apt install -y build-essential libsqlite3-dev \
-  default-libmysqlclient-dev libpq-dev
+RUN apk add --no-cache gcompat tzdata && \
+    apk add --update-cache --no-cache --virtual .build-deps g++ make
 
-# Install gems
-WORKDIR $APP_ROOT
-COPY Gemfile Gemfile.lock rails.rb ./
 RUN gem install bundler
-RUN bundle install --jobs=4
-RUN gem install solargraph yard
+RUN gem install solargraph rubocop
 
-# Install gem documentation
-RUN yard gems
-
-# Install rails documentation
 RUN solargraph bundle
+RUN solargraph download-core
 
-# Solargraph server port
-EXPOSE 7658
-
-# Run Solargraph
 CMD [ "solargraph", "socket", "--host=0.0.0.0", "--port=7658" ]
