@@ -1,5 +1,9 @@
 services:
+  rails:
+    build: ./images/rails
+    ports:
+      - "7658:7658"
   solargraph:
-    build: .
+    build: ./images/without_gemfile
     ports:
       - "7658:7658"
